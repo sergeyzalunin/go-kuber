@@ -25,6 +25,9 @@ container: build
 killshim:
 	sudo killall containerd-shim
 
+stop: killshim
+	docker stop $(APP)	
+
 run: container
 	docker stop $(APP):$(RELEASE) || true && docker rm $(APP):$(RELEASE) || true
 	docker run --name ${APP} -p ${PORT}:${PORT} --rm \
@@ -45,3 +48,9 @@ minikube: push
         echo ---; \
     done > scripts/kubernates/tmp.yaml
 	kubectl apply -f scripts/kubernates/tmp.yaml
+
+check_swagger_install:
+	which swagger || go get -u https://github.com/go-swagger/go-swagger/cmd/swagger
+
+swagger: check_swagger_install
+	swagger generate spec -o ./docs/swagger.yaml --scan-models

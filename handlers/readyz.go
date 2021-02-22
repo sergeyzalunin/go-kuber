@@ -1,17 +1,21 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"sync/atomic"
+
+	"github.com/gin-gonic/gin"
 )
 
 // readyz is a readiness probe.
-func readyz(isReady *atomic.Value) http.HandlerFunc {
-	return func(w http.ResponseWriter, _ *http.Request) {
+func readyz(isReady *atomic.Value) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		if isReady == nil || !isReady.Load().(bool) {
-			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+			c.Status(http.StatusServiceUnavailable)
+			c.Error(fmt.Errorf(http.StatusText(http.StatusServiceUnavailable)))
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		c.Status(http.StatusOK)
 	}
 }

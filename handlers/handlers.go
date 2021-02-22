@@ -5,13 +5,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-const isReadyDuration = 3 * time.Second
+const isReadyDuration = 0 * time.Second
 
 // Router register necessary routes and returns an instance of a router.
-func Router(buildTime, commit, release string) *mux.Router {
+func Router(buildTime, commit, release string) *gin.Engine {
 	isReady := &atomic.Value{}
 	isReady.Store(false)
 
@@ -22,10 +22,10 @@ func Router(buildTime, commit, release string) *mux.Router {
 		log.Printf("Readyz probe is positive.")
 	}()
 
-	r := mux.NewRouter()
-	r.HandleFunc("/home", home(buildTime, commit, release)).Methods("GET")
-	r.HandleFunc("/healthz", healthz)
-	r.HandleFunc("/readyz", readyz(isReady))
+	r := gin.Default()
+	r.GET("/home", home(buildTime, commit, release))
+	r.GET("/healthz", healthz)
+	r.GET("/readyz", readyz(isReady))
 
 	return r
 }
