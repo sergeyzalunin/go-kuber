@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const isReadyDuration = 10 * time.Second
+const isReadyDuration = 3 * time.Second
 
 // Router register necessary routes and returns an instance of a router.
 func Router(buildTime, commit, release string) *mux.Router {

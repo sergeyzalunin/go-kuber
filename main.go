@@ -26,7 +26,7 @@ func main() {
 	r := handlers.Router(version.BuildTime, version.Commit, version.Release)
 
 	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, syscall.SIGTERM)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
 	srv := http.Server{
 		Addr:    ":" + port,

@@ -22,6 +22,9 @@ build: clean
 container: build
 	docker build -t $(CONTAINER_IMAGE):$(RELEASE) .
 
+killshim:
+	sudo killall containerd-shim
+
 run: container
 	docker stop $(APP):$(RELEASE) || true && docker rm $(APP):$(RELEASE) || true
 	docker run --name ${APP} -p ${PORT}:${PORT} --rm \
@@ -35,10 +38,10 @@ push: container
 	docker push $(CONTAINER_IMAGE):$(RELEASE)
 
 minikube: push
-	for t in $(shell find ./kubernetes/advent -type f -name "*.yaml"); do \
+	for t in $(shell find ./scripts/kubernates -type f -name "*.yaml"); do \
         cat $$t | \
-        	gsed -E "s/\{\{(\s*)\.Release(\s*)\}\}/$(RELEASE)/g" | \
-        	gsed -E "s/\{\{(\s*)\.ServiceName(\s*)\}\}/$(APP)/g"; \
+			sed -E "s/\{\{(\s*)\.Release(\s*)\}\}/$(RELEASE)/g" | \
+			sed -E "s/\{\{(\s*)\.ServiceName(\s*)\}\}/$(APP)/g"; \
         echo ---; \
-    done > tmp.yaml
-	kubectl apply -f tmp.yaml
+    done > scripts/kubernates/tmp.yaml
+	kubectl apply -f scripts/kubernates/tmp.yaml
